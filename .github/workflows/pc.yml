@@ -13,13 +13,19 @@ jobs:
         uses: tailscale/github-action@v4
         with:
           authkey: ${{ secrets.TAILSCALE_AUTH_KEY }}
+          tags: tag:ci
 
       - name: Mostrar informações do PC
         shell: pwsh
         run: |
           Write-Host "=== PC WINDOWS ==="
+          Write-Host "Processador:"
           Get-CimInstance Win32_Processor | Select-Object Name, NumberOfCores
+          
+          Write-Host "Memória RAM:"
           Get-CimInstance Win32_ComputerSystem | Select-Object TotalPhysicalMemory
+          
+          Write-Host "Armazenamento:"
           Get-PSDrive C | Select-Object Used, Free
 
       - name: Mostrar IP do Tailscale
@@ -28,10 +34,10 @@ jobs:
           Write-Host "=== IP TAILSCALE ==="
           tailscale ip -4
 
-      - name: Manter o PC ligado
+      - name: Manter o PC ativo
         shell: pwsh
         run: |
-          Write-Host "O PC ficará disponível enquanto esta execução estiver ativa."
+          Write-Host "PC Windows ativo."
           while ($true) {
             Write-Host "PC ativo: $(Get-Date)"
             Start-Sleep -Seconds 60
