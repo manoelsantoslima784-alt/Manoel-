@@ -1,0 +1,38 @@
+name: PC Windows
+
+on:
+  workflow_dispatch:
+
+jobs:
+  windows-pc:
+    runs-on: windows-latest
+    timeout-minutes: 360
+
+    steps:
+      - name: Conectar ao Tailscale
+        uses: tailscale/github-action@v4
+        with:
+          authkey: ${{ secrets.TAILSCALE_AUTH_KEY }}
+
+      - name: Mostrar informações do PC
+        shell: pwsh
+        run: |
+          Write-Host "=== PC WINDOWS ==="
+          Get-CimInstance Win32_Processor | Select-Object Name, NumberOfCores
+          Get-CimInstance Win32_ComputerSystem | Select-Object TotalPhysicalMemory
+          Get-PSDrive C | Select-Object Used, Free
+
+      - name: Mostrar IP do Tailscale
+        shell: pwsh
+        run: |
+          Write-Host "=== IP TAILSCALE ==="
+          tailscale ip -4
+
+      - name: Manter o PC ligado
+        shell: pwsh
+        run: |
+          Write-Host "O PC ficará disponível enquanto esta execução estiver ativa."
+          while ($true) {
+            Write-Host "PC ativo: $(Get-Date)"
+            Start-Sleep -Seconds 60
+          }
